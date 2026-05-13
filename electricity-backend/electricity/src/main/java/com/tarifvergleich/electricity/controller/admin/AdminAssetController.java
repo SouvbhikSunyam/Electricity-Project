@@ -97,8 +97,16 @@ public class AdminAssetController {
 
 	@PostMapping("/add-doc")
 	public ResponseEntity<?> addSuperAdminDoc(@RequestPart("data") String jsonData,
-			@RequestPart("file") MultipartFile file) {
+			@RequestPart(name = "file", required = false) MultipartFile file) {
 		ManageAdminDocumentDto adminDocumentDto = objectMapper.readValue(jsonData, ManageAdminDocumentDto.class);
 		return ResponseEntity.ok(adminAssetService.addAdminDocument(adminDocumentDto, file));
+	}
+
+	@PostMapping("/fetch-admin-documents")
+	public ResponseEntity<?> fetchAdminDocuments(@RequestBody Map<String, Integer> payload) {
+		Integer adminId = payload.get("adminId");
+		Integer page = payload.get("page");
+		Integer size = payload.get("size");
+		return ResponseEntity.ok(adminAssetService.fetchAdminDocuments(adminId, page, size));
 	}
 }
