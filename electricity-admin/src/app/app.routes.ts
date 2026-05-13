@@ -28,6 +28,7 @@ import { BookingDetailComponent } from "./pages/bookings/booking-details/booking
 import { EmailRequestsComponent } from "./pages/email/email-requests/email-requests.component";
 import { EmailCategoryComponent } from "./pages/email/email-category/email-category.component";
 import { EmailTemplateViewComponent } from "./pages/email-template-view/email-template-view.component";
+import { ContentPDFsComponent } from "./pages/contents/content-pdfs/content-pdfs.component";
 
 export const routes: Routes = [
   {
@@ -192,7 +193,12 @@ export const routes: Routes = [
         path: "email-template-view",
         component: EmailTemplateViewComponent,
         title: "E-Mail-Vorlage",
-      }
+      },
+      {
+        path: "content",
+        component: ContentPDFsComponent,
+        title: "content",
+      },
     ],
   },
   {
