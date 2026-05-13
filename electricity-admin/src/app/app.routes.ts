@@ -24,6 +24,9 @@ import { CreateCustomerComponent } from "./pages/customers/create-customer/creat
 import { CreateBookingComponent } from "./pages/bookings/create-booking/create-booking.component";
 import { CustomerCallbackComponent } from "./pages/customer-callback/customer-callback.component";
 import { BookingDetailComponent } from "./pages/bookings/booking-details/booking-details.component";
+// import { EmailComponent } from "./pages/email/email.component";
+import { EmailRequestsComponent } from "./pages/email/email-requests/email-requests.component";
+import { EmailCategoryComponent } from "./pages/email/email-category/email-category.component";
 import { EmailTemplateViewComponent } from "./pages/email-template-view/email-template-view.component";
 import { ContentPDFsComponent } from "./pages/contents/content-pdfs/content-pdfs.component";
 
@@ -169,6 +172,22 @@ export const routes: Routes = [
         path: "bookings/:id",
         component: BookingDetailComponent,
         title: "Buchungsdetails",
+      },
+      // {
+      //   path: "email-management",
+      //   component: EmailComponent,
+      //   title: "E-Mail Verwaltung",
+      //   children: []
+      // },
+      {
+        path: "email-requests",
+        component: EmailRequestsComponent,
+        title: "E-Mail Anfragen",
+      },
+      {
+        path: "email-category",
+        component: EmailCategoryComponent,
+        title: "E-Mail Kategorie",
       },
       {
         path: "email-template-view",
