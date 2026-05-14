@@ -19,6 +19,9 @@ import { LoginPage } from './nav-electricity-comparision/login-page/login-page';
 import { Sidebar } from './layout/sidebar/sidebar';
 import { Register } from './nav-electricity-comparision/register/register';
 import { Customer } from './navigation-pages/customer/customer';
+import { Imprint } from './navigation-pages/imprint/imprint';
+import { DataProtection } from './navigation-pages/data-protection/data-protection';
+import { TermsConditions } from './navigation-pages/terms-conditions/terms-conditions';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -50,6 +53,9 @@ export const routes: Routes = [
     ],
   },
   { path: 'customer', component: Customer },
+  { path: 'imprint', component: Imprint },
+  { path: 'data-protection', component: DataProtection },
+  { path: 'terms-conditions', component: TermsConditions },
   { path: 'gas-comparision', component: GasComparision },
   { path: 'commercial-electricity', component: CommercialElectricity },
 ];
