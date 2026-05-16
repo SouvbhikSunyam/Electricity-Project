@@ -29,7 +29,9 @@ export class EmailRequestsComponent {
   ngOnInit(): void {
     this.http.get("http://localhost:8080/email-category/all")
     .subscribe((res: any) => {
+      console.log(res);
       this.categories = res;
+ 
     })
 
     this.loadPdfs();
