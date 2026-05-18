@@ -189,7 +189,6 @@ export class StaticContentComponent implements OnInit {
       adminId: 1,
       page: this.currentPage,
       size: this.PAGE_LIMIT,
-      
     };
 
     this.http
@@ -294,7 +293,7 @@ export class StaticContentComponent implements OnInit {
           next: (res: any) => {
             this.isUploading = false;
             this.closeModal();
-            this.fetchDocuments(); // Automatically refresh table
+            this.fetchCustomContents(); // Automatically refresh table
           },
           error: (err: any) => {
             this.isUploading = false;
@@ -309,7 +308,7 @@ export class StaticContentComponent implements OnInit {
           next: (res: any) => {
             this.isUploading = false;
             this.closeModal();
-            this.fetchDocuments(); // Automatically refresh table
+            this.fetchCustomContents(); // Automatically refresh table
           },
           error: (err: any) => {
             this.isUploading = false;
