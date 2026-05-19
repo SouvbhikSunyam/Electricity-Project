@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.tarifvergleich.electricity.dto.request.CustomerQueryContactRequestDTO;
 import com.tarifvergleich.electricity.service.common.CommonService;
-
 import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping
@@ -37,5 +38,10 @@ public class commonController {
     @PostMapping("/fetch-customer-queries")
     public ResponseEntity<?> fetchCustomerQueries() {
         return ResponseEntity.ok(commonService.getAllCustomers());
+    }
+
+    @PostMapping("/link-customer-query")
+    public ResponseEntity<?> linkCustomerQuery(@RequestBody Map<String, Object> payload) {
+        return ResponseEntity.ok(commonService.saveQuery((CustomerQueryContactRequestDTO) payload));
     }
 }

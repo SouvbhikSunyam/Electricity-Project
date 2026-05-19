@@ -33,6 +33,7 @@ import { AdminSignatureComponent } from "./pages/credentials/admin-signature/adm
 import { StaticContentComponent } from "./pages/contents/static-content/static-content.component";
 import { EmailTemplateListComponent } from "./pages/email/email-template-list/email-template-list.component";
 import { TaxManagementComponent } from "./pages/credentials/tax-management/tax-management.component";
+import { ContactQueryComponent } from "./pages/customer-query/contact-query/contact-query.component";
 
 export const routes: Routes = [
   {
@@ -158,6 +159,11 @@ export const routes: Routes = [
         title: "Neuen Kunden anlegen",
       },
       {
+        path: "contact-query/list",
+        component: ContactQueryComponent,
+        title: "Kontaktanfragen",
+      },
+      {
         path: "booking/new",
         component: CreateBookingComponent,
         title: "Neue Buchung erstellen",
@@ -184,11 +190,11 @@ export const routes: Routes = [
       },
       {
         path: "email-template",
-        component: EmailTemplateListComponent
+        component: EmailTemplateListComponent,
       },
       {
         path: "email-template/create",
-        component: EmailRequestsComponent
+        component: EmailRequestsComponent,
       },
       {
         path: "email-requests",
