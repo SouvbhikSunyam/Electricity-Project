@@ -243,7 +243,7 @@
   border-top: none;
 }
 .customer-profile-box::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 20px; /* gap start */
@@ -387,7 +387,7 @@
 }
 
 .slider:before {
-  content: '';
+  content: "";
   position: absolute;
   height: 18px;
   width: 18px;
@@ -556,13 +556,13 @@
 
 /* Green check icon from assets */
 .check-list li::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 4px;
   width: 16px;
   height: 16px;
-  background: url('/assets/icons/Kreis_Haken_gruen.png') no-repeat center;
+  background: url("/assets/icons/Kreis_Haken_gruen.png") no-repeat center;
   background-size: contain;
 }
 
@@ -677,12 +677,12 @@
 
 /* Green tick */
 .guideline-icon.valid {
-  background-image: url('/assets/icons/Kreis_Haken_gruen.png');
+  background-image: url("/assets/icons/Kreis_Haken_gruen.png");
 }
 
 /* Red cross */
 .guideline-icon.invalid {
-  background-image: url('/assets/icons/cross.png');
+  background-image: url("/assets/icons/cross.png");
 }
 
 .btn-back,
@@ -830,7 +830,7 @@
 .form-group.full {
   width: 100%;
 }
-.postcode{
+.postcode {
   flex: 0 0 160px;
 }
 
@@ -2031,7 +2031,7 @@
   background: #0085e0;
 }
 
-.upload-option input[type='radio'] {
+.upload-option input[type="radio"] {
   width: 12px;
   height: 12px;
   accent-color: #ffffff;
@@ -2044,7 +2044,7 @@
   }
 }
 
-.upload-option input[type='checkbox'] {
+.upload-option input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
 
@@ -2060,8 +2060,8 @@
 }
 
 /* checked tick */
-.upload-option input[type='checkbox']:checked::after {
-  content: '✓';
+.upload-option input[type="checkbox"]:checked::after {
+  content: "✓";
 
   position: absolute;
   top: 50%;
@@ -2362,7 +2362,6 @@
     flex-direction: column;
   }
 }
-
 
 /* ══════════════════════════════════════════════
    MOBILE ≤768px
@@ -2873,10 +2872,263 @@
     width: 100%;
     max-width: 100%;
   }
-  .postcode{
+  .postcode {
     flex: none;
   }
-  .container-readonly{
+  .container-readonly {
     padding-right: 0;
+  }
+}
+/*──────────────────────────────────────────────────
+  PROFILE TAB (Tab 0) – Persönliche Daten
+──────────────────────────────────────────────────*/
+
+/* Orange section header (used inside profile sub-tabs) */
+.profile-orange-header {
+  background-color: #fc770a;
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Status completion grid ── */
+.profile-status-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.profile-status-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.profile-status-card.profile-status-ok {
+  border-color: #00a651;
+  color: #1a1a1a;
+}
+
+.profile-status-card.profile-status-err {
+  border-color: #cc0000;
+  color: #1a1a1a;
+}
+
+.profile-status-card.profile-status-upload {
+  background-color: #fff8f5;
+}
+
+.profile-status-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+/* ── Quick-access action buttons ── */
+.profile-action-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.profile-action-btn {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s;
+}
+
+.profile-action-btn:hover {
+  opacity: 0.85;
+}
+
+.profile-action-btn--light {
+  background-color: #e8f4fd;
+  color: #0085e0;
+  border: 1px solid #0085e0;
+}
+
+.profile-action-btn--dark {
+  background-color: #0b3c6d;
+  color: #fff;
+}
+
+/* ── Contact / Address form shared ── */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ── Address extra table ── */
+.address-table,
+.meter-extra-table,
+.payment-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.address-table-header,
+.address-table-row,
+.meter-extra-table-header,
+.meter-extra-table-row,
+.payment-table-header,
+.payment-table-row {
+  display: grid;
+  gap: 0;
+  font-size: 13px;
+}
+
+.address-table-header,
+.meter-extra-table-header,
+.payment-table-header {
+  background-color: #fc770a;
+  color: #fff;
+  font-weight: 600;
+}
+
+.address-table-header {
+  grid-template-columns: repeat(8, 1fr) 80px;
+}
+
+.address-table-row {
+  grid-template-columns: repeat(8, 1fr) 80px;
+}
+
+.meter-extra-table-header {
+  grid-template-columns: repeat(7, 1fr) 80px;
+}
+
+.meter-extra-table-row {
+  grid-template-columns: repeat(7, 1fr) 80px;
+}
+
+.payment-table-header {
+  grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr 80px;
+}
+
+.payment-table-row {
+  grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr 80px;
+}
+
+.address-table-header > div,
+.address-table-row > div,
+.meter-extra-table-header > div,
+.meter-extra-table-row > div,
+.payment-table-header > div,
+.payment-table-row > div {
+  padding: 10px 10px;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+}
+
+.address-table-row > div,
+.meter-extra-table-row > div,
+.payment-table-row > div {
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.address-table-row:last-child > div,
+.meter-extra-table-row:last-child > div,
+.payment-table-row:last-child > div {
+  border-bottom: none;
+}
+
+/* ── SEPA payment cards ── */
+.payment-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.payment-sepa-card {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.payment-sepa-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.payment-sepa-logo {
+  border: 2px solid #1a1a1a;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.payment-sepa-badge {
+  background-color: #00a651;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.payment-sepa-name {
+  font-size: 13px;
+}
+
+.payment-sepa-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.payment-detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 2px 0;
+}
+
+.payment-change-btn {
+  align-self: flex-end;
+  margin-top: 4px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .profile-status-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .payment-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .profile-status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-action-grid {
+    flex-direction: column;
   }
 }

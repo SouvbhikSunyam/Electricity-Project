@@ -80,6 +80,9 @@ export class Customer {
   serviceTab: number = 1;
   documentTab: number = 0;
 
+  // ── Profile sub-tab control ─────────────────────────────────────────
+  profileSubTab: string = ''; // 'contact' | 'addresses' | 'meters' | 'payment' | 'contracts'
+
   /* ── Step control ──────────────────────────────────────────────── */
   currentStep: number = 1;
   redirect: number = 1;
@@ -94,8 +97,13 @@ export class Customer {
     name: '',
     email: '',
     phone: '',
+    phoneNumber: '', // ← add (template uses customerData.phoneNumber)
+    dateOfBirth: '', // ← add
+    emailVerified: false, // ← add (used by status card)
     salutation: '',
     title: '',
+    firstName: '',
+    lastName: '',
     userType: '',
     companyName: '',
     isVerified: false,
@@ -106,6 +114,11 @@ export class Customer {
       street: '',
       houseNumber: '',
     },
+    additionalAddresses: [], // ← add (further addresses table)
+    standardMeters: [], // ← add (standard meter form rows)
+    additionalMeters: [], // ← add (further meters table)
+    standardBankAccounts: [], // ← add (SEPA cards)
+    additionalBankAccounts: [], // ← add (further payment table)
     deliveryDetails: [],
   };
   isLoading = true;
@@ -125,6 +138,7 @@ export class Customer {
     this.serviceTab = 1;
     this.documentTab = 0;
     this.selectedIndex = -1;
+    this.profileSubTab = '';
     this.resetForm();
 
     if (this.activeTab == 3) {
@@ -250,6 +264,9 @@ export class Customer {
           lastName: data.lastName || '',
           email: data.email || '',
           phone: data.mobileNumber || '',
+          phoneNumber: data.mobileNumber || '', // ← add
+          dateOfBirth: data.dateOfBirth || '', // ← add (adjust field name to match your API)
+          emailVerified: data.isVerified || false, // ← add (map from whatever API field)
           salutation: data.salutation || '',
           title: data.title || '',
           userType: data.userType || '',
@@ -264,6 +281,12 @@ export class Customer {
             street: data?.address?.street || '',
             houseNumber: data?.address?.houseNumber || '',
           },
+
+          additionalAddresses: data.additionalAddresses || [], // ← add
+          standardMeters: data.standardMeters || [], // ← add
+          additionalMeters: data.additionalMeters || [], // ← add
+          standardBankAccounts: data.standardBankAccounts || [], // ← add
+          additionalBankAccounts: data.additionalBankAccounts || [], // ← add
 
           deliveryDetails: data.deliveryDetails || [],
         };
@@ -1389,10 +1412,7 @@ export class Customer {
     this.showList = true;
     this.showDetails = false;
     this.confirmationList = false;
-    if (
-      this.activeTab === 3 &&
-      (step === 2 || step === 3 || step == 4)
-    ) {
+    if (this.activeTab === 3 && (step === 2 || step === 3 || step == 4)) {
       this.fetchServiceCount();
       this.fetchAllRequests();
     }
@@ -2182,5 +2202,85 @@ export class Customer {
       });
   }
   /* ──  Reset Password Section End ──*/
+  /* ════════════════════════════════════════════════════════════════════════════════════════════════*/
+
+  /* ════════════════════════════════════════════════════════════════════════════════════════════════*/
+  /* ──  Profile Information Section Start ──*/
+
+  /* ──  Profile Information Section Start ──*/
+
+  saveContactData(): void {
+    const customerId = this.authService.getUserId() || 0;
+    const body = {
+      id: Number(customerId),
+      salutation: this.customerData.salutation,
+      title: this.customerData.title,
+      firstName: this.customerData.firstName,
+      lastName: this.customerData.lastName,
+      email: this.customerData.email,
+      mobileNumber: this.customerData.phoneNumber,
+      dateOfBirth: this.customerData.dateOfBirth,
+    };
+
+    this.http.post<any>(`${API_BASE}/customer/update-contact`, body).subscribe({
+      next: (res) => {
+        if (res?.res) {
+          this.customerData.name =
+            `${this.customerData.firstName} ${this.customerData.lastName}`.trim();
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => console.error('saveContactData error:', err),
+    });
+  }
+
+  saveAddressData(): void {
+    const customerId = this.authService.getUserId() || 0;
+    const body = {
+      id: Number(customerId),
+      address: {
+        zip: this.customerData.address.zip,
+        city: this.customerData.address.city,
+        street: this.customerData.address.street,
+        houseNumber: this.customerData.address.houseNumber,
+      },
+    };
+
+    this.http.post<any>(`${API_BASE}/customer/update-address`, body).subscribe({
+      next: (res) => {
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('saveAddressData error:', err),
+    });
+  }
+
+  saveMeterData(): void {
+    const customerId = this.authService.getUserId() || 0;
+    const body = {
+      id: Number(customerId),
+      meters: this.customerData.standardMeters,
+    };
+
+    this.http.post<any>(`${API_BASE}/customer/update-meters`, body).subscribe({
+      next: (res) => {
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('saveMeterData error:', err),
+    });
+  }
+
+  editBankAccount(account: any): void {
+    // Navigate to edit view or open a modal — adjust to your routing pattern
+    console.log('editBankAccount:', account);
+  }
+
+  changeBankAccount(account: any): void {
+    // Trigger payment-method change flow — adjust to your routing pattern
+    console.log('changeBankAccount:', account);
+  }
+
+  /* ──  Profile Information Section End ──*/
+
+  /* ──  Profile Information Section Start ──*/
   /* ════════════════════════════════════════════════════════════════════════════════════════════════*/
 }

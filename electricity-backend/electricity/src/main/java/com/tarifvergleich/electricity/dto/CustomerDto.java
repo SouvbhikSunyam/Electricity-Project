@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Optional;
 
 import com.tarifvergleich.electricity.dto.CustomerAttornyDto.CustomerAttornyForAdminCustomerList;
+import com.tarifvergleich.electricity.dto.CustomerBankAccountDto.CustomerBankAccountForProfileDto;
 import com.tarifvergleich.electricity.dto.CustomerChangePasswordHistoryDto.CustomerChangePasswordHistoryResDto;
 import com.tarifvergleich.electricity.dto.CustomerDeliveryResponseDto.CustomerAddressRes;
 import com.tarifvergleich.electricity.dto.CustomerDeliveryResponseDto.CustomerDeliveryProfileDetail;
 import com.tarifvergleich.electricity.dto.CustomerNoteDto.CustomerNoteResponseDto;
 import com.tarifvergleich.electricity.model.Customer;
+//import com.tarifvergleich.electricity.dto.CustomerNoteDto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -202,6 +204,7 @@ public class CustomerDto {
 		private BigInteger joinedOn;
 		private List<CustomerDeliveryProfileDetail> deliveryDetails;
 		private List<CustomerAddressDto> address;
+		private List<CustomerBankAccountForProfileDto> bankAccounts;
 		private Boolean isNotificationEnabled;
 
 		private String zip;
@@ -283,6 +286,8 @@ public class CustomerDto {
 						.stream().map(CustomerDeliveryResponseDto::getDeliveryResponseForProfile).toList())
 				.address(Optional.ofNullable(customer.getCustomerAddresses()).orElseGet(Collections::emptyList).stream()
 						.map(CustomerAddressDto::getCustomerAddressResponseDto).toList())
+				.bankAccounts(Optional.ofNullable(customer.getBankAccounts()).orElseGet(Collections::emptyList).stream()
+						.map(CustomerBankAccountDto::mapResponseForProfile).toList())
 				.zip(customer.getZip()).city(customer.getCity()).street(customer.getStreet())
 				.houseNumber(customer.getHouseNumber()).lexofficeNumber(customer.getLexofficeNumber()).build();
 	}

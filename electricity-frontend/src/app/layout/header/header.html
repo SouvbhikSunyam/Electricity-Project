@@ -30,19 +30,12 @@
       </div>
 
       <ul class="nav-links mobile-nav">
-        <li
-          *ngFor="let item of navItems"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{
+        <li *ngFor="let item of navItems" routerLinkActive="active" [routerLinkActiveOptions]="{
             exact: item.originalFileName !== 'Stromvergleich.png',
-          }"
-        >
+          }">
           <a [routerLink]="getRouterLink(item.originalFileName)" (click)="closeMenu()">
-            <img
-              [src]="getImageUrl(item.contentUrl)"
-              [class]="getIconClass(item.originalFileName)"
-              [alt]="item.originalFileName"
-            />
+            <img [src]="getImageUrl(item.contentUrl)" [class]="getIconClass(item.originalFileName)"
+              [alt]="item.originalFileName" />
 
             <span class="nav-text">
               {{ item.heading }}
@@ -63,9 +56,9 @@
           </span>
 
           @if (isLoggedIn()) {
-            <h3 class="text login-link">Profil</h3>
+          <h3 class="text login-link">Profil</h3>
           } @else {
-            <h3 class="text login-link">Login</h3>
+          <h3 class="text login-link">Login</h3>
           }
         </button>
       </div>
@@ -79,12 +72,13 @@
           <input type="text" placeholder="Was möchten Sie vergleichen?" />
           <span class="dropdown-arrow"></span>
         </div>
+        
 
         <!-- Search Icon -->
-        <button class="mobile-search-icon-btn">🔍</button>
+        <!-- <button class="mobile-search-icon-btn">🔍</button> -->
 
         <!-- Close Icon -->
-        <button class="mobile-search-close" (click)="toggleSearch()">✕</button>
+        <!-- <button class="mobile-search-close" (click)="toggleSearch()">✕</button> -->
       </div>
     </div>
 
@@ -109,11 +103,7 @@
             <span class="text">Sie wünschen eine Beratung durch Experten?</span>
           </div>
           <div class="icon phone">
-            <img
-              src="assets/icons/Telefonhörer_Weiss.png"
-              class="phone-icon"
-              alt="telephone-icon"
-            />
+            <img src="assets/icons/Telefonhörer_Weiss.png" class="phone-icon" alt="telephone-icon" />
           </div>
           <div>
             <span class="expert phone">
@@ -162,9 +152,9 @@
           </span>
 
           @if (isLoggedIn()) {
-            <h3 class="text login-link">Profil</h3>
+          <h3 class="text login-link">Profil</h3>
           } @else {
-            <h3 class="text login-link">Login</h3>
+          <h3 class="text login-link">Login</h3>
           }
         </button>
       </div>
