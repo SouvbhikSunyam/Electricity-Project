@@ -1,15 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
-@import url('https://fonts.googleapis.com/css2?family=Encode+Sans:wght@300;400;500;600;700&display=swap');
-@import 'flatpickr/dist/flatpickr.min.css';
+@import url("https://fonts.googleapis.com/css2?family=Encode+Sans:wght@300;400;500;600;700&display=swap");
+@import "flatpickr/dist/flatpickr.min.css";
 
 html,
 body {
   height: 100%;
-  font-family: 'Encode Sans', sans-serif;
+  font-family: "Encode Sans", sans-serif;
 }
 body {
   margin: 0;
-  font-family: 'Encode Sans', sans-serif;
+  font-family: "Encode Sans", sans-serif;
   font-weight: 400;
   font-size: 16px;
   background-color: #ffffff;
@@ -26,7 +26,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Encode Sans', sans-serif;
+  font-family: "Encode Sans", sans-serif;
 }
 
 .compare-all {
@@ -422,19 +422,17 @@ h6 {
   }
 }
 @media screen and (max-width: 768px) {
-
   .container-provider {
     position: absolute;
 
-    top: 70px;
+    top: 15px;
 
     transition: top 0.3s ease;
   }
 
   body.mobile-search-open .container-provider {
-    top: 130px;
+    top: 15px;
   }
-
 }
 /*  --------------------------- common part for heizstrom, Ladestrom --------------------- */
 
@@ -647,20 +645,6 @@ button[mat-icon-button] {
   padding: 0.5rem 1rem;
 }
 
-@media screen and (max-width: 768px) {
-  .container-contact .contact-us {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
-    width: 100%;
-  }
-
-  .container-contact .main-btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
 .container-services-left,
 .container-services-right {
   display: flex;
@@ -818,7 +802,7 @@ button[mat-icon-button] {
   position: relative;
 }
 .progress-steps::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 35%;
   left: 78px;
@@ -1039,7 +1023,7 @@ button[mat-icon-button] {
   padding: 10px 14px;
 }
 .toggle-box::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 1px;
   background: #4a4949;
@@ -1090,7 +1074,7 @@ button[mat-icon-button] {
 .mat-calendar-body-cell-content,
 .mat-calendar-body-label {
   font-size: 16px;
-  font-family: 'Encode Sans', sans-serif;
+  font-family: "Encode Sans", sans-serif;
 }
 
 /* Weekday labels (Mo, Tu, etc.) */
@@ -1098,7 +1082,7 @@ button[mat-icon-button] {
 .mat-calendar-header,
 .mat-focus-indicator,
 .mdc-button__label {
-  font-family: 'Encode Sans', sans-serif;
+  font-family: "Encode Sans", sans-serif;
 }
 
 .mobile-registration-dialog .mat-mdc-dialog-container {
@@ -1113,7 +1097,6 @@ button[mat-icon-button] {
   padding: 16px !important;
 }
 @media screen and (max-width: 768px) {
-
   /* hide desktop full line */
   .progress-steps::before {
     display: none !important;

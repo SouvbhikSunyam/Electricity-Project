@@ -396,16 +396,12 @@
 ========================================= */
 
 @media screen and (max-width: 768px) {
-  .electricity {
-    cursor: grab;
-    user-select: none;
-  }
   /* ---------- MAIN LAYOUT ---------- */
 
   .home-container {
     display: flex;
     flex-direction: column;
-
+    position: relative;
     height: auto;
 
     margin: 0;
@@ -473,24 +469,25 @@
 
   /* Right-side fade + chevron arrow to hint horizontal scroll */
   .electricity-container::after {
-    content: "›";
+    display: none;
+    /* content: "›";
     position: absolute;
     top: 50%;
     right: 4px;
     transform: translateY(-50%);
     width: 36px;
     height: calc(100% - 20px);
-    background: transparent; /* ← was the white gradient, now gone */
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     padding-right: 4px;
     font-size: 22px;
     font-weight: 700;
-    color: #00a651; /* ← was #003366 (dark blue), now green */
+    color: #00a651;
     pointer-events: none;
     border-radius: 0 8px 8px 0;
-    z-index: 2;
+    z-index: 2; */
   }
 
   .electricity {
@@ -512,16 +509,20 @@
     scrollbar-color: #00a651 rgba(0, 51, 102, 0.15);
   }
 
-  /* Webkit scrollbar styling */
+  .electricity {
+    scrollbar-width: thin;
+    scrollbar-color: #0085e0 rgba(0, 133, 224, 0.15); /* thumb = active blue, track = light blue */
+  }
+
   .electricity::-webkit-scrollbar {
-    height: 4px;
+    height: 5px; /* slightly thicker for visibility */
   }
   .electricity::-webkit-scrollbar-track {
-    background: rgba(0, 51, 102, 0.1);
+    background: rgba(0, 133, 224, 0.15);
     border-radius: 4px;
   }
   .electricity::-webkit-scrollbar-thumb {
-    background: #003366;
+    background: #0085e0; /* active button blue */
     border-radius: 4px;
   }
 
@@ -916,10 +917,9 @@
 
   .banner-call-btn {
     display: flex;
-
     position: absolute;
 
-    top: 80px;
+    top: 25px; /* within the 170px banner — adjust to taste */
     right: 14px;
 
     width: 38px;
@@ -932,11 +932,9 @@
     border-radius: 50%;
 
     background: #ff6b00;
-
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 
     z-index: 50;
-
     cursor: pointer;
   }
 
