@@ -1,0 +1,53 @@
+/* Bigger editor */
+:host ::ng-deep .ck-editor__editable_inline {
+    min-height: 500px;
+    max-height: 800px;
+    overflow-y: auto;
+
+    padding: 24px !important;
+
+    font-size: 15px;
+    line-height: 1.8;
+
+    background: transparent;
+}
+
+/* Toolbar */
+:host ::ng-deep .ck-toolbar {
+    border: none !important;
+    border-bottom: 1px solid #e5e7eb !important;
+
+    padding: 10px 12px !important;
+
+    flex-wrap: wrap !important;
+}
+
+/* Remove extra borders */
+:host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Focus */
+:host ::ng-deep .ck.ck-editor__editable:focus {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Hide 3-dot menu completely */
+:host ::ng-deep .ck-toolbar__items .ck-dropdown__panel,
+:host ::ng-deep .ck.ck-toolbar .ck-toolbar__grouped-dropdown {
+    display: none !important;
+}
+
+/* Dark mode */
+.dark :host ::ng-deep .ck-toolbar,
+.dark :host ::ng-deep .ck-editor__main,
+.dark :host ::ng-deep .ck-editor__editable {
+    background: #111827 !important;
+    color: #f3f4f6 !important;
+}
+
+.dark :host ::ng-deep .ck-button {
+    color: #d1d5db !important;
+}
