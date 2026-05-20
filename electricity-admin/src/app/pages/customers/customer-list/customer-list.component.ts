@@ -317,6 +317,33 @@ export class CustomerListComponent implements OnInit {
     this.router.navigate(['/customers/details', id])
   }
 
+  formatDate(value?: number | string | null): string {
+    if (value === null || value === undefined || value === '') {
+      return '—';
+    }
+
+    const num = typeof value === 'number'
+      ? value
+      : Number(value);
+
+    if (Number.isNaN(num)) {
+      return String(value);
+    }
+
+    const ms = num < 1_000_000_000_000
+      ? num * 1000
+      : num;
+
+    return new Intl.DateTimeFormat('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }).format(new Date(ms));
+  }
+
   /**
    * Toggle GDPR contact permission for a customer.
    * Calls the mock endpoint admin/update-gdpr-contact-status.
