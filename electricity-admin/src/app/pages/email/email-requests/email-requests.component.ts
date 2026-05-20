@@ -1,28 +1,28 @@
-import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { Component } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { FormsModule } from "@angular/forms";
+import { CommonModule } from "@angular/common";
+import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
 @Component({
-  selector: 'app-email-requests',
+  selector: "app-email-requests",
   imports: [FormsModule, CommonModule, CKEditorModule],
   standalone: true,
-  templateUrl: './email-requests.component.html',
-  styleUrl: './email-requests.component.css',
+  templateUrl: "./email-requests.component.html",
+  styleUrl: "./email-requests.component.css",
 })
 export class EmailRequestsComponent {
-
-  selectedCategory: string = '';
-  title: string = '';
-  subtitle: string = '';
-  emailContent: string = '';
+  selectedCategory: string = "";
+  title: string = "";
+  subtitle: string = "";
+  emailContent: string = "";
   Editor = ClassicEditor;
 
   pdfList: any[] = [];
-  selectedPdfs: any[] = [];
-  selectedPdfValue: String = '';
-  message: string = '';
+  selectedPdfIds: Set<number> = new Set();
+  isPdfDropdownOpen: boolean = false;
+  message: string = "";
   isError: boolean = false;
 
   categories: any[] = [];
@@ -30,134 +30,147 @@ export class EmailRequestsComponent {
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.http.get("http://localhost:8080/email-category/all")
-    .subscribe((res: any) => {
-      console.log(res);
-      this.categories = res;
- 
-    })
+    this.http
+      .post("http://192.168.0.155:8080/email-category/all", { adminId: 1 })
+      .subscribe((res: any) => {
+        console.log(res);
+        this.categories = res;
+      });
 
     this.loadPdfs();
   }
-  
-  loadPdfs() {
 
+  loadPdfs() {
     const payload = {
       adminId: 1,
       page: 0,
-      size: 100
+      size: 100,
     };
-    this.http.post<any>('http://192.168.155:8080/admin/fetch-admin-documents',
-      payload
-    )
-    .subscribe({
-
-      next: (res) => {
-        console.log(res);
-        this.pdfList = res.data || res.content || res;
-      },
-
-      error: (err) => {
-        console.log(err);
-      }
-    });
+    this.http
+      .post<any>("http://192.168.155:8080/admin/fetch-admin-documents", payload)
+      .subscribe({
+        next: (res) => {
+          console.log(res);
+          this.pdfList = res.data || res.content || res;
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
   }
 
-  addPdf(pdfId: any) {
-
-    const pdf = this.pdfList.find(
-      p => p.adminDocId == pdfId
-    );
-      if (
-      pdf &&
-      !this.selectedPdfs.some ( p => p.adminDocId == pdf.adminDocId
-        )
-      ) {
-          this.selectedPdfs.push(pdf);
-        }
-        this.selectedPdfValue = '';
+  togglePdfDropdown() {
+    this.isPdfDropdownOpen = !this.isPdfDropdownOpen;
   }
 
-  removePdf(index: number) {
-    this.selectedPdfs.splice(index, 1);
+  closePdfDropdown() {
+    this.isPdfDropdownOpen = false;
+  }
+
+  togglePdfSelection(pdfId: number) {
+    if (this.selectedPdfIds.has(pdfId)) {
+      this.selectedPdfIds.delete(pdfId);
+    } else {
+      this.selectedPdfIds.add(pdfId);
+    }
+  }
+
+  isPdfSelected(pdfId: number): boolean {
+    return this.selectedPdfIds.has(pdfId);
+  }
+
+  get selectedPdfsLabel(): string {
+    const count = this.selectedPdfIds.size;
+    if (count === 0) return "Wählen dein PDF";
+    if (count === 1) {
+      const pdf = this.pdfList.find((p) =>
+        this.selectedPdfIds.has(p.adminDocId),
+      );
+      return pdf?.type || pdf?.documentType || "1 PDF ausgewählt";
+    }
+    return `${count} PDFs ausgewählt`;
+  }
+
+  // Strips HTML tags and &nbsp; only for empty-check — original content is never modified
+  private isEditorEmpty(html: string): boolean {
+    const stripped = html
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;/g, "")
+      .trim();
+    return stripped.length === 0;
   }
 
   submitForm() {
+    if (
+      !this.selectedCategory ||
+      !this.title.trim() ||
+      this.isEditorEmpty(this.emailContent)
+    ) {
+      this.message = "Please fill all mandatory fields";
+      this.isError = true;
 
-      if (
-        !this.selectedCategory ||
-        !this.title.trim() ||
-        !this.subtitle.trim() ||
-        !this.emailContent.trim()
-      ) {
+      setTimeout(() => {
+        this.message = "";
+      }, 3000);
 
-        this.message = 'Please fill all mandatory fields';
-        this.isError = true;
+      return;
+    }
 
-        setTimeout(() => {
-          this.message = '';
-        }, 3000);
+    // emailContent is sent as-is — preserves all admin formatting from CKEditor
+    const body = {
+      adminId: 1,
+      title: this.title,
+      subtitle: this.subtitle,
+      emailContent: this.emailContent,
+      cateId: this.selectedCategory,
+      pdfIds: Array.from(this.selectedPdfIds),
+    };
 
-        return;
-      }
-
-      const body = {
-
-        title: this.title,
-        subtitle: this.subtitle,
-        emailContent: this.emailContent,
-        createdBy: 'Admin',
-
-        cateId: this.selectedCategory,
-
-        pdfIds: this.selectedPdfs.map(pdf => pdf.adminDocId)
-
-      };
-
-      this.http.post(
-        'http://localhost:8080/email-management/save',
-        body
-      ).subscribe({
-
+    this.http
+      .post("http://192.168.0.155:8080/admin/email-management/save", body)
+      .subscribe({
         next: (res) => {
-
-          this.message = 'Successfully Submitted';
+          this.message = "Successfully Submitted";
           this.isError = false;
 
-          this.title = '';
-          this.subtitle = '';
-          this.emailContent = '';
-          this.selectedCategory = '';
-          this.selectedPdfs = [];
+          this.title = "";
+          this.subtitle = "";
+          this.emailContent = "";
+          this.selectedCategory = "";
+          this.selectedPdfIds = new Set();
 
           setTimeout(() => {
-            this.message = '';
+            this.message = "";
           }, 3000);
         },
-
         error: (err) => {
-
           console.log(err);
-
-          this.message = 'Submission Failed';
+          this.message = "Submission Failed";
           this.isError = true;
 
           setTimeout(() => {
-            this.message = '';
+            this.message = "";
           }, 3000);
-        }
-
+        },
       });
+  }
 
-    }
+  cancelForm() {
+    this.selectedCategory = "";
+    this.title = "";
+    this.subtitle = "";
+    this.emailContent = "";
+    this.selectedPdfIds = new Set();
+    this.message = "";
+  }
 
-    cancelForm() {
-
-      this.selectedCategory = '';
-      this.title = '';
-      this.subtitle = '';
-      this.emailContent = '';
-
-      this.message = '';
-    }
+  copyToClipboard(text: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      this.message = `"${text}" copied to clipboard!`;
+      this.isError = false;
+      setTimeout(() => {
+        this.message = "";
+      }, 2000);
+    });
+  }
 }
