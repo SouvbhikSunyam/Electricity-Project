@@ -1,8 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
+import { FormsModule } from "@angular/forms";
 import { ApiService } from "../../../shared/services/api.service";
 import { AuthService } from "../../../shared/services/auth.service";
+import { HttpClient } from "@angular/common/http";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Full API response types (mirrors the /admin/fetch-deliveries response shape)
@@ -191,7 +193,7 @@ const DOC_BASE_URL = "http://192.168.0.155:8080/assets/customers/";
 @Component({
   selector: "app-booking-detail",
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: "./booking-details.component.html",
   styleUrl: "./booking-details.component.css",
 })
@@ -224,6 +226,13 @@ export class BookingDetailComponent implements OnInit {
   uploadMessage = "";
   uploadError = "";
 
+  // ── Update Meter Number modal ───────────────────────────────────────────────
+  isMeterModalOpen = false;
+  meterNumberInput = "";
+  isUpdatingMeter = false;
+  meterUpdateMessage = "";
+  meterUpdateError = "";
+
   readonly dayLabels: Record<string, string> = {
     MONDAY: "Montag",
     TUESDAY: "Dienstag",
@@ -246,6 +255,7 @@ export class BookingDetailComponent implements OnInit {
     private router: Router,
     private api: ApiService,
     private authService: AuthService,
+    private http: HttpClient,
   ) {}
 
   ngOnInit(): void {
@@ -255,6 +265,18 @@ export class BookingDetailComponent implements OnInit {
     } else {
       this.errorMessage = "Keine Buchungs-ID angegeben.";
     }
+  }
+
+  isEmailCopied = false;
+
+  copyEmail(email: string): void {
+    if (!email) return;
+    navigator.clipboard.writeText(email).then(() => {
+      this.isEmailCopied = true;
+      setTimeout(() => {
+        this.isEmailCopied = false;
+      }, 2000);
+    });
   }
 
   fetchBooking(deliveryId: number): void {
@@ -361,7 +383,10 @@ export class BookingDetailComponent implements OnInit {
    */
   get isPending(): boolean {
     return (
-      !this.isExpired && this.booking !== null && this.booking?.order === null
+      !this.isExpired &&
+      this.booking !== null &&
+      this.booking?.order === null &&
+      this.booking?.connection !== null
     );
   }
 
@@ -451,6 +476,7 @@ export class BookingDetailComponent implements OnInit {
           // Refresh booking so the status advances to "Order Created".
           // No document is generated at this point — the admin must click
           // "Upload Documents" separately to trigger doc generation.
+
           this.fetchBooking(this.booking!.deliveryId ?? 0);
         } else {
           this.orderError =
@@ -473,6 +499,7 @@ export class BookingDetailComponent implements OnInit {
    * Once successful the booking is refreshed and the PDF appears in the
    * documents section below for viewing / downloading.
    */
+  
   generateDocument(): void {
     if (!this.booking?.order?.orderId) return;
     this.isGeneratingDoc = true;
@@ -494,7 +521,8 @@ export class BookingDetailComponent implements OnInit {
           this.fetchBooking(this.booking!.deliveryId ?? 0);
         } else {
           this.generateDocError =
-            res?.errMessage ?? "Unbekannter Fehler beim Hochladen des Dokuments.";
+            res?.errMessage ??
+            "Unbekannter Fehler beim Hochladen des Dokuments.";
         }
       },
       error: (err) => {
@@ -590,6 +618,59 @@ export class BookingDetailComponent implements OnInit {
         console.error("Upload document error:", err);
       },
     });
+  }
+
+  // ── Action: Update Meter Number ───────────────────────────────────────────
+
+  openMeterModal(): void {
+    if (!this.booking) return;
+    this.isMeterModalOpen = true;
+    this.meterNumberInput = this.booking.connection?.meterNumber || "";
+    this.meterUpdateMessage = "";
+    this.meterUpdateError = "";
+  }
+
+  closeMeterModal(): void {
+    if (this.isUpdatingMeter) return;
+    this.isMeterModalOpen = false;
+    this.meterNumberInput = "";
+    this.meterUpdateMessage = "";
+    this.meterUpdateError = "";
+  }
+
+  updateMeterNumber(): void {
+    if (!this.booking?.deliveryId) return;
+    this.isUpdatingMeter = true;
+    this.meterUpdateError = "";
+    this.meterUpdateMessage = "";
+
+    const payload = {
+      adminId: this.authService.getUserId() || 1,
+      deliveryId: this.booking.deliveryId,
+      meterNumber: this.meterNumberInput.trim(),
+    };
+
+    this.http
+      .post("http://localhost:8080/admin/update-meter-number", payload)
+      .subscribe({
+        next: (res: any) => {
+          this.isUpdatingMeter = false;
+          if (res?.res) {
+            this.meterUpdateMessage =
+              res.message ?? "Zählernummer erfolgreich aktualisiert.";
+            this.fetchBooking(this.booking!.deliveryId ?? 0);
+            setTimeout(() => this.closeMeterModal(), 1500);
+          } else {
+            this.meterUpdateError =
+              res?.message ?? "Fehler beim Aktualisieren der Zählernummer.";
+          }
+        },
+        error: (err) => {
+          this.isUpdatingMeter = false;
+          this.meterUpdateError = "Fehler beim Aktualisieren.";
+          console.error("Meter update error:", err);
+        },
+      });
   }
 
   // ── Navigation ────────────────────────────────────────────────────────────

@@ -273,5 +273,4 @@ public class Customer {
 	public void setUserAdmin(AdminUser admin) {
 		this.admin = admin;
 	}
-
 }
