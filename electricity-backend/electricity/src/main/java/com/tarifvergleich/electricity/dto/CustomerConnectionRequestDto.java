@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.tarifvergleich.electricity.model.CustomerConnect;
 
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,84 +20,87 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CustomerConnectionRequestDto {
 
-	private Integer id;
+    private Integer id;
 
-	private Boolean isMovingIn;
+    private Boolean isMovingIn;
 
-	@JsonFormat(pattern = "dd.MM.yyyy")
-	private LocalDate moveInDate;
+    @JsonFormat(pattern = "dd.MM.yyyy")
+    private LocalDate moveInDate;
 
-	private Boolean submitLater;
+    private Boolean submitLater;
 
-	private String meterNumber;
+    private String meterNumber;
 
-	private String marketLocationId;
+    private Integer adminId;
 
-	private String currentProvider;
+    private Integer deliveryId;
 
-	private Boolean autoCancellation;
+    private String marketLocationId;
 
-	private Boolean alreadyCancelled;
+    private String currentProvider;
 
-	private Boolean selfCancellation;
+    private Boolean autoCancellation;
 
-	private Boolean delivery;
-	
-	private String customerNumber;
+    private Boolean alreadyCancelled;
 
-	@JsonFormat(pattern = "dd.MM.yyyy")
-	private LocalDate desiredDelivery;
+    private Boolean selfCancellation;
 
-	@JsonSetter("moveInDate")
-	public void setMoveInDate(String moveInDateStr) {
-		if (moveInDateStr == null || moveInDateStr.isBlank()) {
-			this.moveInDate = null;
-		} else {
-			this.moveInDate = LocalDate.parse(moveInDateStr, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-		}
-	}
+    private Boolean delivery;
 
-	@JsonSetter("desiredDelivery")
-	public void setDesiredDelivery(String desiredDeliveryStr) {
-		if (desiredDeliveryStr == null || desiredDeliveryStr.isBlank()) {
-			this.desiredDelivery = null;
-		} else {
-			this.desiredDelivery = LocalDate.parse(desiredDeliveryStr, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-		}
-	}
+    private String customerNumber;
 
-	@Data
-	@Builder
-	@AllArgsConstructor
-	@NoArgsConstructor
-	public static class CustomerConnectionResponse {
-		private Integer id;
-		private Boolean isMovingIn;
-		private BigInteger moveInDate;
-		private Boolean submitLater;
-		private String meterNumber;
-		private String marketLocationId;
-		private String currentProvider;
-		private Boolean autoCancellation;
-		private Boolean alreadyCancelled;
-		private Boolean selfCancellation;
-		private Boolean delivery;
-		private BigInteger desiredDelivery;
-		private String customerNumber;
-	}
+    @JsonFormat(pattern = "dd.MM.yyyy")
+    private LocalDate desiredDelivery;
 
-	public static CustomerConnectionResponse getConnectionResponse(CustomerConnect connect) {
+    @JsonSetter("moveInDate")
+    public void setMoveInDate(String moveInDateStr) {
+        if (moveInDateStr == null || moveInDateStr.isBlank()) {
+            this.moveInDate = null;
+        } else {
+            this.moveInDate = LocalDate.parse(moveInDateStr, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        }
+    }
 
-		if (connect == null)
-			return null;
+    @JsonSetter("desiredDelivery")
+    public void setDesiredDelivery(String desiredDeliveryStr) {
+        if (desiredDeliveryStr == null || desiredDeliveryStr.isBlank()) {
+            this.desiredDelivery = null;
+        } else {
+            this.desiredDelivery = LocalDate.parse(desiredDeliveryStr, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        }
+    }
 
-		return CustomerConnectionResponse.builder().id(connect.getId()).isMovingIn(connect.getIsMovingIn())
-				.moveInDate(connect.getMoveInDate()).submitLater(connect.getSubmitLater())
-				.meterNumber(connect.getMeterNumber()).marketLocationId(connect.getMarketLocationId())
-				.currentProvider(connect.getCurrentProvider()).autoCancellation(connect.getAutoCancellation())
-				.alreadyCancelled(connect.getAlreadyCancelled()).selfCancellation(connect.getSelfCancellation())
-				.customerNumber(connect.getCustomerNumber())
-				.delivery(connect.getDelivery()).desiredDelivery(connect.getDesiredDelivery()).build();
-	}
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CustomerConnectionResponse {
+        private Integer id;
+        private Boolean isMovingIn;
+        private BigInteger moveInDate;
+        private Boolean submitLater;
+        private String meterNumber;
+        private String marketLocationId;
+        private String currentProvider;
+        private Boolean autoCancellation;
+        private Boolean alreadyCancelled;
+        private Boolean selfCancellation;
+        private Boolean delivery;
+        private BigInteger desiredDelivery;
+        private String customerNumber;
+    }
 
+    public static CustomerConnectionResponse getConnectionResponse(CustomerConnect connect) {
+
+        if (connect == null)
+            return null;
+
+        return CustomerConnectionResponse.builder().id(connect.getId()).isMovingIn(connect.getIsMovingIn())
+                .moveInDate(connect.getMoveInDate()).submitLater(connect.getSubmitLater())
+                .meterNumber(connect.getMeterNumber()).marketLocationId(connect.getMarketLocationId())
+                .currentProvider(connect.getCurrentProvider()).autoCancellation(connect.getAutoCancellation())
+                .alreadyCancelled(connect.getAlreadyCancelled()).selfCancellation(connect.getSelfCancellation())
+                .customerNumber(connect.getCustomerNumber())
+                .delivery(connect.getDelivery()).desiredDelivery(connect.getDesiredDelivery()).build();
+    }
 }

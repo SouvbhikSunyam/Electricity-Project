@@ -78,5 +78,4 @@ public class CustomerConnect {
 	protected void onCreate() {
 		createdOn = Helper.getCurrentTimeBerlin();
 	}
-	
 }

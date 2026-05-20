@@ -467,11 +467,8 @@ public class AdminCustomerManagementService {
 				customer.setIsAcknowledged(true);
 				customerRepo.save(customer);
 			}
-
 			return createResponse;
-
 		}
-
 		throw new InternalServerException("Internal Server Error", HttpStatus.OK);
 	}
 
@@ -491,9 +488,7 @@ public class AdminCustomerManagementService {
 		CustomerNote note = CustomerNote.builder().note(noteDto.getNote()).build();
 
 		customer.addCustomerNote(note);
-
 		customerRepo.save(customer);
-
 		return Map.of("res", true, "message", "Note added successfully");
 	}
 

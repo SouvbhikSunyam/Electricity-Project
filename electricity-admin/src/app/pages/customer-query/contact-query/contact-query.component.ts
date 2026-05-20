@@ -45,6 +45,7 @@ export type ContactQuery = {
   categoryName: string;
   CategoryId: number;
   customer: Customer | null;
+  customers?: Customer[];
 };
 
 @Component({
@@ -72,14 +73,8 @@ export class ContactQueryComponent implements OnInit, OnDestroy {
 
   // ── Search ───────────────────────────────────────────────────
   searchTerm = "";
-  searchSuggestions: Customer[] = [];
-  selectedSearchCustomers: Customer[] = [];
-  isSearchDropdownOpen = false;
-  isSearchingSuggestions = false;
   private searchTerm$ = new Subject<string>();
   private searchSub!: Subscription;
-
-  @ViewChild("mainSearchInput") mainSearchInputRef!: ElementRef<HTMLInputElement>;
 
   // ── Link Customer Modal ──────────────────────────────────────
   isModalOpen = false;
@@ -98,6 +93,10 @@ export class ContactQueryComponent implements OnInit, OnDestroy {
   linkSuccessMessage = "";
   linkErrorMessage = "";
 
+  // View Linked Users Modal
+  isViewLinkedModalOpen = false;
+  viewLinkedEntry: ContactQuery | null = null;
+
   private customerSearch$ = new Subject<string>();
   private customerSearchSub!: Subscription;
 
@@ -113,10 +112,7 @@ export class ContactQueryComponent implements OnInit, OnDestroy {
       .pipe(debounceTime(350), distinctUntilChanged())
       .subscribe((term) => {
         this.fetchQueries(1);
-        this.fetchSearchSuggestions(term);
       });
-
-    this.fetchSearchSuggestions("");
 
     this.customerSearchSub = this.customerSearch$
       .pipe(debounceTime(400), distinctUntilChanged())
@@ -132,87 +128,19 @@ export class ContactQueryComponent implements OnInit, OnDestroy {
 
   onSearchInput(value: string): void {
     this.searchTerm = value;
-    this.isSearchDropdownOpen = true;
     this.searchTerm$.next(value);
   }
 
   clearSearch(): void {
     this.searchTerm = "";
-    this.selectedSearchCustomers = [];
     this.searchTerm$.next("");
-  }
-
-  // ── Main Search Multi-Select Logic ────────────────────────────
-
-  onMainSearchBlur(): void {
-    setTimeout(() => {
-      this.isSearchDropdownOpen = false;
-    }, 200);
-  }
-
-  toggleSearchDropdown(event: Event): void {
-    event.stopPropagation();
-    this.isSearchDropdownOpen = !this.isSearchDropdownOpen;
-    if (this.isSearchDropdownOpen) {
-      setTimeout(() => this.mainSearchInputRef?.nativeElement.focus(), 50);
-    }
-  }
-
-  fetchSearchSuggestions(term: string): void {
-    this.isSearchingSuggestions = true;
-    const payload = {
-      adminId: this.authService.getUserId(),
-      search: term.trim() || undefined,
-      page: 1,
-      limit: 10,
-    };
-    this.http
-      .post("http://192.168.0.234:8080/admin/fetch-customer-details", payload)
-      .subscribe({
-        next: (res: any) => {
-          this.isSearchingSuggestions = false;
-          this.searchSuggestions = this.extractCustomerList(res);
-        },
-        error: () => {
-          this.isSearchingSuggestions = false;
-          this.searchSuggestions = [];
-        },
-      });
-  }
-
-  isSearchCustomerSelected(id: number): boolean {
-    return this.selectedSearchCustomers.some((c) => c.id === id);
-  }
-
-  addSearchCustomer(customer: Customer): void {
-    if (!this.isSearchCustomerSelected(customer.id)) {
-      this.selectedSearchCustomers = [...this.selectedSearchCustomers, customer];
-    }
-    this.searchTerm = "";
-    this.isSearchDropdownOpen = false;
-    this.searchTerm$.next("");
-  }
-
-  onMainSearchFocus(): void {
-    this.isSearchDropdownOpen = true;
-    if (!this.searchTerm && this.searchSuggestions.length === 0) {
-      this.searchTerm$.next("");
-    }
-  }
-
-  removeSearchCustomer(id: number): void {
-    this.selectedSearchCustomers = this.selectedSearchCustomers.filter((c) => c.id !== id);
-    this.fetchQueries(1);
   }
 
   // ── Data fetching ─────────────────────────────────────────────
 
   fetchQueries(page: number = 1): void {
     this.currentPage = page;
-    const searchTerms = [
-      ...this.selectedSearchCustomers.map((c) => `${c.firstName} ${c.lastName}`),
-      this.searchTerm.trim()
-    ].filter(Boolean).join(" ");
+    const searchTerms = this.searchTerm.trim();
 
     const payload = {
       adminId: this.authService.getUserId(),
@@ -337,7 +265,11 @@ export class ContactQueryComponent implements OnInit, OnDestroy {
 
   // Focus the hidden input when clicking the tag box
   focusSearch(): void {
+    this.isDropdownOpen = true;
     this.searchInputRef?.nativeElement.focus();
+    if (!this.customerSearchTerm && this.customerSearchResults.length === 0) {
+      this.customerSearch$.next("");
+    }
   }
 
   onCustomerSearchFocus(): void {
@@ -434,7 +366,7 @@ export class ContactQueryComponent implements OnInit, OnDestroy {
     };
 
     this.http
-      .post("http://192.168.0.234:8080/admin/fetch-customer-details", payload)
+      .post("http://192.168.0.234:8080/link-customer-query", payload)
       .subscribe({
         next: () => {
           this.isLinking = false;
@@ -448,7 +380,8 @@ export class ContactQueryComponent implements OnInit, OnDestroy {
           if (idx !== -1) {
             this.queries[idx] = {
               ...this.queries[idx],
-              customer: this.selectedCustomers[0],
+              customer: this.selectedCustomers[0] || null,
+              customers: [...this.selectedCustomers],
             };
           }
           setTimeout(() => this.closeLinkModal(), 1500);
@@ -477,9 +410,22 @@ export class ContactQueryComponent implements OnInit, OnDestroy {
   }
 
   queryInitials(entry: ContactQuery): string {
-    const f = entry.firstName?.[0] ?? "";
-    const l = entry.lastName?.[0] ?? "";
-    return (f + l).toUpperCase() || "?";
+    return entry.customer
+      ? (entry.customer.firstName[0] || "") + (entry.customer.lastName[0] || "")
+      : (entry.firstName[0] || "") + (entry.lastName[0] || "");
+  }
+
+  // ── View Linked Users ─────────────────────────────────────────
+
+  openViewLinkedModal(event: Event, entry: ContactQuery): void {
+    event.stopPropagation();
+    this.viewLinkedEntry = entry;
+    this.isViewLinkedModalOpen = true;
+  }
+
+  closeViewLinkedModal(): void {
+    this.isViewLinkedModalOpen = false;
+    this.viewLinkedEntry = null;
   }
 
   formatDateTime(value?: number | string | null): string {

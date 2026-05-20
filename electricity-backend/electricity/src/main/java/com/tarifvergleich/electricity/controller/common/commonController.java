@@ -13,13 +13,12 @@ import com.tarifvergleich.electricity.dto.request.CustomerQueryContactRequestDTO
 import com.tarifvergleich.electricity.service.common.CommonService;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping
-@CrossOrigin(origins = "*")
 public class commonController {
 
     private final CommonService commonService;
@@ -42,6 +41,15 @@ public class commonController {
 
     @PostMapping("/link-customer-query")
     public ResponseEntity<?> linkCustomerQuery(@RequestBody Map<String, Object> payload) {
-        return ResponseEntity.ok(commonService.saveQuery((CustomerQueryContactRequestDTO) payload));
+        Integer queryId = payload.get("customerQueryContactId") != null ? ((Number) payload.get("customerQueryContactId")).intValue() : null;
+
+        List<?> rawCustomerIds = (List<?>) payload.get("customerIds");
+        List<Integer> customerIds = null;
+        if (rawCustomerIds != null) {
+            customerIds = rawCustomerIds.stream()
+                    .map(id -> ((Number) id).intValue())
+                    .collect(java.util.stream.Collectors.toList());
+        }
+        return ResponseEntity.ok(commonService.linkCustomersToQuery(queryId, customerIds));
     }
 }

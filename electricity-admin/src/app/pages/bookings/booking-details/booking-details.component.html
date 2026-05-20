@@ -80,6 +80,17 @@
                 </button>
                 }
 
+                <!-- ── PENDING only: Update Meter Number ──────────────────────
+                     Shown when isPending is true. Allows admin to update the meter number
+                     before creating the order. -->
+                @if (isPending) {
+                <button (click)="openMeterModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-lg
+                 bg-teal-50 text-teal-700 hover:bg-teal-100 dark:bg-teal-900/20 dark:text-teal-400
+                 dark:hover:bg-teal-900/40 border border-teal-200 dark:border-teal-700/40 transition cursor-pointer">
+                    Zählernummer aktualisieren
+                </button>
+                }
+
                 <!-- ── PENDING only: Create Order ─────────────────────────
                      Shown when the booking has been fully submitted by the
                      customer but no internal order record exists yet.
@@ -228,8 +239,30 @@
                             {{ getBookingStatus() }}
                         </span>
                     </div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ booking.email ||
-                        booking.customer?.email || '—' }}</p>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ booking.email || booking.customer?.email || '—' }}</p>
+                        @if (booking.email || booking.customer?.email) {
+                        <div class="relative flex items-center">
+                            <button (click)="copyEmail(booking.email || booking.customer?.email || '')" title="E-Mail kopieren" class="p-1 text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 rounded transition cursor-pointer">
+                                @if (isEmailCopied) {
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                } @else {
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 012-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                }
+                            </button>
+                            @if (isEmailCopied) {
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-1 text-[10px] font-medium text-white bg-gray-800 dark:bg-gray-700 rounded shadow-sm whitespace-nowrap pointer-events-none transition-all duration-200 animate-in fade-in slide-in-from-bottom-1">
+                                Kopiert!
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-4 border-transparent border-t-gray-800 dark:border-t-gray-700"></div>
+                            </div>
+                            }
+                        </div>
+                        }
+                    </div>
                     <p class="text-xs font-mono text-gray-400 mt-1">Delivery {{ booking.deliveryId ?? '—' }} / {{
                         booking.uniqueDeliveryId || '—' }}</p>
                     @if (booking.customer?.salutation || booking.customer?.title || booking.title) {
@@ -891,7 +924,7 @@
 </div>
 
 @if (showUploadModal) {
-<div class="fixed inset-0 z-50 flex items-center justify-center p-4"
+<div class="fixed inset-0 z-99999 flex items-center justify-center p-4"
     style="background: rgba(0,0,0,0.55); backdrop-filter: blur(3px);" (click)="closeUploadModal()">
     <div class="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 space-y-5"
         (click)="$event.stopPropagation()">
@@ -959,6 +992,77 @@
                 Wird hochgeladen...
                 } @else {
                 Hochladen
+                }
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     METER NUMBER UPDATE MODAL
+     ═══════════════════════════════════════════════════════════════════════ -->
+@if (isMeterModalOpen) {
+<div class="fixed inset-0 z-99999 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm"
+    (click)="closeMeterModal()">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all"
+        (click)="$event.stopPropagation()">
+
+        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Zählernummer aktualisieren</h3>
+            <button (click)="closeMeterModal()" [disabled]="isUpdatingMeter"
+                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 transition cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-6 space-y-4">
+            @if (meterUpdateMessage) {
+            <div
+                class="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 p-3 rounded-lg text-sm mb-4">
+                {{ meterUpdateMessage }}
+            </div>
+            }
+            @if (meterUpdateError) {
+            <div class="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 p-3 rounded-lg text-sm mb-4">
+                {{ meterUpdateError }}
+            </div>
+            }
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Neue Zählernummer (Max. 11 Zeichen)
+                </label>
+                <input type="text" [(ngModel)]="meterNumberInput" [disabled]="isUpdatingMeter"
+                    maxlength="11"
+                    pattern="^[A-Za-z0-9]{1,11}$"
+                    #meterNumberRef="ngModel"
+                    placeholder="z.B. D9179637613 || 12345678901"
+                    class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition text-gray-900 dark:text-white disabled:opacity-50" />
+                @if (meterNumberRef.invalid && (meterNumberRef.dirty || meterNumberRef.touched)) {
+                <p class="text-xs text-red-500 mt-1.5">
+                    Nur Buchstaben und Zahlen erlaubt, maximal 11 Zeichen.
+                </p>
+                }
+            </div>
+        </div>
+
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3">
+            <button (click)="closeMeterModal()" [disabled]="isUpdatingMeter"
+                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer disabled:opacity-50">
+                Abbrechen
+            </button>
+            <button (click)="updateMeterNumber()" 
+                [disabled]="isUpdatingMeter || !meterNumberInput || meterNumberRef.invalid"
+                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 border border-brand-700 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                @if (isUpdatingMeter) {
+                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Wird gespeichert...
+                } @else {
+                Speichern
                 }
             </button>
         </div>

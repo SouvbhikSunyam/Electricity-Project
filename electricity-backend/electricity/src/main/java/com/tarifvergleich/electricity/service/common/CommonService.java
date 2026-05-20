@@ -14,12 +14,8 @@ import com.tarifvergleich.electricity.repository.CustomerQueryContactRepository;
 import com.tarifvergleich.electricity.repository.CustomerRepository;
 import com.tarifvergleich.electricity.util.Helper;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashMap;
 import java.util.List;
@@ -104,6 +100,21 @@ public class CommonService {
 
     private CustomerQueryContactResponseDTO mapToCustomerQueryContactDto(
             CustomerQueryContact contact) {
+        java.util.List<CustomerDto.CustomerShortDetail> customersList = null;
+        if (contact.getCustomerIds() != null && !contact.getCustomerIds().isEmpty()) {
+            java.util.List<Integer> ids = java.util.Arrays.stream(contact.getCustomerIds().split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .map(Integer::valueOf)
+                    .collect(Collectors.toList());
+            if (!ids.isEmpty()) {
+                customersList = customerRepository.findAllById(ids)
+                        .stream()
+                        .map(CustomerDto::customerShortResponse)
+                        .collect(Collectors.toList());
+            }
+        }
+
         return CustomerQueryContactResponseDTO.builder()
                 .customerQueryContactId(contact.getId())
                 .salutation(contact.getSalutation())
@@ -122,21 +133,30 @@ public class CommonService {
                 .CategoryId(contact.getQueryCategory() != null ?
                         contact.getQueryCategory().getId() : null)
                 .customer(contact.getCustomer() != null ? CustomerDto.customerShortResponse(contact.getCustomer()) : null)
+                .customers(customersList)
                 .build();
     }
 
-    public Object linkCustomersToQuery(Integer adminId, Integer queryId, List<Integer> customerIds) {
-        CustomerQueryContact query = queryContactRepository.findById(customerIds.getFirst())
-                .orElseThrow(() -> new EntityNotFoundException("Query not found with id: " + customerIds.getFirst()));
-        if (!customerIds.isEmpty()) {
-            if (!(adminId == null) || !(queryId == null)) {
-                String idsStr = customerIds.stream().map(String::valueOf).collect(Collectors.joining(","));
-                query.setCustomerIds(idsStr);
-            }
+    public Map<String, Object> linkCustomersToQuery(Integer queryId, List<Integer> customerIds) {
+        CustomerQueryContact query = queryContactRepository.findById(queryId)
+                .orElseThrow(() -> new EntityNotFoundException("Query not found with id: " + queryId));
+
+        if (customerIds != null && !customerIds.isEmpty()) {
+            Customer primaryCustomer = customerRepository.findById(customerIds.getFirst())
+                    .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + customerIds.getFirst()));
+            query.setCustomer(primaryCustomer);
+
+            String idsStr = customerIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+            query.setCustomerIds(idsStr);
+        } else {
+            query.setCustomer(null);
+            query.setCustomerIds(null);
         }
+
+        CustomerQueryContact saved = queryContactRepository.save(query);
         Map<String, Object> map = new HashMap<>();
         map.put("res", true);
-        map.put("data", query);
+        map.put("data", mapToCustomerQueryContactDto(saved));
         return map;
     }
 }

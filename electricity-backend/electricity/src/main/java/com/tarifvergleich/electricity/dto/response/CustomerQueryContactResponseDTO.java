@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @Data
 @Builder
@@ -27,4 +28,5 @@ public class CustomerQueryContactResponseDTO {
     private String categoryName;
     private Integer CategoryId;
     private CustomerDto.CustomerShortDetail customer;
+    private List<CustomerDto.CustomerShortDetail> customers;
 }
